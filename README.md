@@ -45,11 +45,11 @@
   - Traffic (geo mark/other meta) = 38.5 * 5kb = 1725kb ~ 1,7 mb/s
 
 - Просмотр ленты
-  - RPS = 10.000.000 * 50 / 86.400 ~ 5787
-  - Traffic (media) = 5787 * 1mb (avg_image_size) = 5787mb ~ 5.787.000kb ~ 5gb/s
-  - Traffic (text) = 5787 * 100kb (avg_text_size) = 578.700kb ~ 578мb/s
+  - RPS = 10.000.000 * 20 / 86.400 ~ 2314
+  - Traffic (media) = 2314 * 1mb (avg_image_size) = 2314 ~ 2.3.000kb ~ 2gb/s
+  - Traffic (text) = 2314 * 100kb (avg_text_size) = 231.400kb ~ 231мb/s
   - Traffic (reactions) (тк в требованиях нет реации на комменты , то считаем только на посты в медиане) =
-  5787 * 500b = 2600000b ~ 2,6 mb/s
-  - Traffic (meta data) = 5787 * 50kb = 260000kb ~ 260mb/s
+  2314 * 500b = 2600000b ~ 1,1 mb/s
+  - Traffic (meta data) = 2314 * 50kb = 260000kb ~ 110mb/s
 
 Connections = 10.000.000 * 0.1 = 1.000.000
