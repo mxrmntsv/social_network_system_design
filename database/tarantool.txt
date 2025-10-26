@@ -1,5 +1,8 @@
 // Образное предствление хранения файлов в tarantool
 
+// Replication master-slave
+// RF = 2
+
 feed_info {
     user_id UUID pk,
     last_update_date date,
