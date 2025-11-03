@@ -1,7 +1,7 @@
 // Образное предствление хранения файлов в S3 хранилища
 
 // Replication master-slave
-// RF = 2
+// RF = 3
 
 object {
   key path
