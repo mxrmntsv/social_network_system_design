@@ -17,7 +17,7 @@ info:
   version: 1.0.0
 
 paths:
-  /account/create:
+  /account:
     put:
       summary: create new account
       description: Method creates new account in system
@@ -65,7 +65,7 @@ paths:
         500:
           description: Server error
 
-  /account/get/{accountId}:
+  /account/{accountId}:
     get:
       summary: get account info by id
       description: Method returns account info
