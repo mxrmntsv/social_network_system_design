@@ -119,10 +119,10 @@ Disks = max(ceil(Disks_for_capacity), ceil(Disks_for_throughput), ceil(Disks_for
 
 2.Текст
 >capacity = 31 МБ/c * 86400 * 365 = 977Тб <br>
->Disks_for_capacity = 977ТБ / 90ТБ = 30 <br>
->Disks_for_throughput = 31 МБ/c (из расчета трафика) / 500 МБ/c = 0.31 <br>
+>Disks_for_capacity = 977ТБ / 90ТБ = 10 <br>
+>Disks_for_throughput = 31 МБ/c (из расчета трафика) / 500 МБ/c = 0.06 <br>
 >Disks_for_iops = 385 / 1000 = 3.85 <br>
->Disks = max (ceil(3.85), ceil(0.31) , ceil(30)) = <b>30 шт</b>
+>Disks = max (ceil(3.85), ceil(0.31) , ceil(30)) = <b>10 шт</b>
 
 3. Мета
 >capacity = 17 МБ/c * 86400 * 365 = 536ТБ <br>
@@ -138,4 +138,4 @@ Disks = max(ceil(Disks_for_capacity), ceil(Disks_for_throughput), ceil(Disks_for
 >Disks_for_iops = 385 / 1000 = 0.385 <br>
 >Disks = max (ceil(0.385), ceil(0.001) , ceil(0.8)) = <b>1 шт</b>
 
-Итого: <b>исходя из расчетов выгоднее брать SSD</b>
+Итого: <b>Исходя из расчетов для отдельных типов данных итог следующий: media - SSD; реакции - HDD; мета - HDD; текст - в целом можно тоже взять SSD с заделом на будущее</b>
