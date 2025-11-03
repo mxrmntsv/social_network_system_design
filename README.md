@@ -139,3 +139,46 @@ Disks = max(ceil(Disks_for_capacity), ceil(Disks_for_throughput), ceil(Disks_for
 >Disks = max (ceil(0.385), ceil(0.001) , ceil(0.8)) = <b>1 шт</b>
 
 Итого: <b>Исходя из расчетов для отдельных типов данных итог следующий: media - SSD; реакции - HDD; мета - HDD; текст - в целом можно тоже взять SSD с заделом на будущее</b>
+
+
+## Оценка дисков
+
+#### Формулы
+
+Hosts = disks / disks_per_host <br>
+Hosts_with_replication = hosts \* replication_factor <br>
+
+#### PostgreSql
+Для БД хранения данных PostgreSql (схема main_schema) <b>Replication</b>: master-slave sync.<b> RF = 3</b>.<br> Шардирование по account_id
+. Notice: Роутинг идет по account_id в шарду, где хранятся посты и комменты. В каждом запросе, включая получение хоста будет иметься инфо от чьего аккаунта пост. <br>
+
+---
+Для хранения связей тэгов и локаций используем отдельную БД master-slave sync c RF = ??? c чтением из реплик и мастера.
+
+#### S3
+Для хранилища S3 используем <b>Replication</b>: master-slave sync.<b>, <b>RF = 3</b> на первый год.
+
+#### Tarantool
+<b>Replication</b>: master-slave sync. RF = 2
+
+#### Расчеты
+
+<b>Медиа</b>: <br>
+SSD<br>
+Hosts: 66 / (1 disc = 1 host) = 66 (исходя из iops) <br>
+Hosts_with_replication: 66 * RF2 = <b>132</b>
+
+<b>Текст</b>: <br>
+SSD<br>
+Hosts: 10 / (5 disc = 1host) = 2 (исходя из iops)<br>
+Hosts_with_replication: 2 * RF3 = <b>6</b>
+
+<b>Реакции</b>: <br>
+HDD<br>
+Hosts: 4 / (4 disc = 1host) = 1 (исходя из iops) <br>
+Hosts_with_replication: 1 * RF3 = <b>3</b>
+
+<b>Мета</b>: <br>
+HDD<br>
+Hosts: 17 / (10 disc = 1 host) = 2 (исходя из iops) <br>
+Hosts_with_replication: 2 * RF3 = <b>6</b>
