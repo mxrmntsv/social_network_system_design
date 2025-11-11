@@ -141,25 +141,27 @@ Disks = max(ceil(Disks_for_capacity), ceil(Disks_for_throughput), ceil(Disks_for
 Итого: <b>Исходя из расчетов для отдельных типов данных итог следующий: media - SSD; реакции - HDD; мета - HDD; текст - в целом можно тоже взять SSD с заделом на будущее</b>
 
 
-## Оценка дисков
+## Оценка хостов
 
 #### Формулы
 
 Hosts = disks / disks_per_host <br>
 Hosts_with_replication = hosts \* replication_factor <br>
 
-#### PostgreSql
+#### PostgreSql (данные пользователей, посты, комментарии)
 Для БД хранения данных PostgreSql (схема main_schema) <b>Replication</b>: master-slave sync.<b> RF = 3</b>.<br> Шардирование по account_id
 . Notice: Роутинг идет по account_id в шарду, где хранятся посты и комменты. В каждом запросе, включая получение хоста будет иметься инфо от чьего аккаунта пост. <br>
 
 ---
-Для хранения связей тэгов и локаций используем отдельную БД master-slave sync c RF = ??? c чтением из реплик и мастера.
+Для хранения связей тэгов и локаций используем таблицы , которые будут иметь единое состояние во всех шардах и репликах (обновление данных через broadcast запрос по спец. прикладу).
 
 #### S3
 Для хранилища S3 используем <b>Replication</b>: master-slave sync.<b>, <b>RF = 3</b> на первый год.
+Шардирование по account_id
 
 #### Tarantool
 <b>Replication</b>: master-slave sync. RF = 2
+Шардирование по account_id
 
 #### Расчеты
 
