@@ -1,0 +1,68 @@
+// Replication: master-slave sync 
+// Тк время загрузки контента не так важна, как чтение, то можно запись делать в один ЦОД, а читать из разный.
+// RF = 2
+
+// Sharding by account_id
+//Notice: Роутинг идет по account_id в шарду, где хранятся посты и комменты,
+// В каждом запросе, включая получение хоста будет иметься инфо от чьего аккаунта пост
+
+//Notice: tags & places stored in separated DB for one union state for each shard
+
+Table account {
+  id uuid [primary key]
+  create_date timestamp
+  username varchar(50)
+  email varchar(30)
+  phone varchar(30)
+  password varchar(30)
+}
+
+Table post {
+  id uuid [primary key]
+  create_date timestamp
+  account_id uuid
+  location decimal
+  mediaId uuid
+  mediaLink varchar(512)
+  text varchar(256)
+  like_count int
+}
+
+Table account_posts {
+  account_id uuid
+  post_id uuid
+}
+
+Table comment {
+  id uuid [primary key]
+  account_id uuid
+  post_id uuid
+  create_date timestamp
+  text varchar(512)
+}
+
+Table tag_post {
+  tag_id uuid
+  post_id uuid
+}
+
+Table subscribe {
+  account_id uuid
+  channel_id uuid
+}
+
+Ref account_id_account: account.id < account_posts.account_id
+
+Ref post_id_post: post.id < account_posts.post_id
+
+Ref comment_post: comment.post_id > post.id
+
+Ref comment_to_account: comment.account_id > account.id
+
+Ref post_id_post_tag: post.id < tag_post.post_id 
+
+Ref tag_id_post_tag: tag.id < tag_post.tag_id
+
+Ref account_id_subs: account.id < subscribe.account_id
+
+Ref channel_id_subs: account.id < subscribe.channel_id
