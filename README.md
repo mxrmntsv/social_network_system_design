@@ -39,10 +39,10 @@
 ## Расчет примерной нагрузки
 
 - Публикация
-  - RPS = 10.000.000 / 3 / 86.400 ~ 38.5
-  - Traffic (media) = 38.5 * 1mb (avg_image_size) = 38.5 mb/s
-  - Traffic (text) = 38.5 * 100kb (avg_text_size) = 38.500kb ~ 3.85 mb/s
-  - Traffic (geo mark/other meta) = 38.5 * 5kb = 1725kb ~ 1,7 mb/s
+  - RPS = 10.000.000 / 3 / 86.400 ~ 385
+  - Traffic (media) = 385 * 1mb (avg_image_size) = 385 mb/s
+  - Traffic (text) = 385 * 100kb (avg_text_size) = 385000kb ~ 31 mb/s
+  - Traffic (geo mark/other meta) = 385 * 5kb = 1725kb ~ 17 mb/s
 
 - Просмотр ленты
   - RPS = 10.000.000 * 20 / 86.400 ~ 2314
@@ -53,3 +53,89 @@
   - Traffic (meta data) = 2314 * 50kb = 260000kb ~ 110mb/s
 
 Connections = 10.000.000 * 0.1 = 1.000.000
+
+## Оценка дисков
+
+#### Референсные характеристики
+|    | HDD|SSD (SATA)| SSD (nVME)|
+|-----|------|-------------|-------------|
+|Объем|до 32ТБ|до 100ТБ|до 30ТБ|
+|Операции ввода-вывода в секунду|100|1 000|10 00|
+|Пропускная способность|100 МБ/с|500 МБ/с|3 ГБ/с|
+
+#### Формулы
+
+Disks_for_capacity = capacity / disk_capacity<br>
+Disks_for_throughput = traffic_per_second / disk_throughput<br>
+Disks_for_iops = iops / disk_iops<br>
+Disks = max(ceil(Disks_for_capacity), ceil(Disks_for_throughput), ceil(Disks_for_iops))
+
+>Где:
+>**disk_capacity** - объем одного диска <br>
+>**capacity** - суммарный объем данных, которое необходимо хранить <br>
+>**traffic_per_second** - суммарный трафик на запись/чтение в секунду <br>
+>**disk_throughput** - пропускная способность одного диска <br>
+>**iops** - суммарное количество запросов в секунду <br>
+>**disk_iops** - количество операций ввода-вывод диска в секунду <br>
+>**ceil** - функция округления вверх до целого числа <br>
+
+<b><i>На первый год хранения сравним дешевую и среднюю конфигурации:</i></b><br>
+<b>HDD:</b><br>
+1.Медиа
+>capacity = 385 МБ/c * 86400 * 365 *0.5 (с учетом сжатия данных) = 6Пб <br>
+>Disks_for_capacity = 6000ТБ / 32ТБ = 187,5 <br>
+>Disks_for_throughput = 385 МБ/c (из расчета трафика) / 100 МБ/c = 3.85 <br>
+>Disks_for_iops = 385 / 100 = 3.85 <br>
+>Disks = max (ceil(3.85), ceil(3.85) , ceil(187,5)) = <b>187 шт</b> 
+
+2.Текст
+>capacity = 31 МБ/c * 86400 * 365 = 977Тб <br>
+>Disks_for_capacity = 977ТБ / 32ТБ = 30 <br>
+>Disks_for_throughput = 31 МБ/c (из расчета трафика) / 100 МБ/c = 0.31 <br>
+>Disks_for_iops = 385 / 100 = 3.85 <br>
+>Disks = max (ceil(3.85), ceil(0.31) , ceil(30)) = <b>30 шт</b> 
+
+3. Мета
+>capacity = 17 МБ/c * 86400 * 365 = 536ТБ <br>
+>Disks_for_capacity = 536ТБ / 32ТБ = 16.75 <br>
+>Disks_for_throughput = 17 МБ/c (из расчета трафика) / 100 МБ/c = 0.17 <br>
+>Disks_for_iops = 385 / 100 = 3.85 <br>
+>Disks = max (ceil(3.85), ceil(0.17) , ceil(16.75)) = <b>17 шт</b>
+
+4. Реакции
+>capacity = 0.5 МБ/c * 86400 * 365 = 15.8ТБ <br>
+>Disks_for_capacity = 15.8ТБ / 32ТБ = 0.49 <br>
+>Disks_for_throughput = 0.5 МБ/c (из расчета трафика) / 100 МБ/c = 0.02 <br>
+>Disks_for_iops = 385 / 100 = 3.85 <br>
+>Disks = max (ceil(0.49), ceil(3.85) , ceil(0.02)) = <b>4 шт</b>
+
+<b>SSD:</b><br>
+1.Медиа
+>capacity = 385 МБ/c * 86400 * 365 *0.5 (с учетом сжатия данных) = 6Пб <br>
+>Disks_for_capacity = 6000ТБ / 90ТБ = 66 <br>
+>Disks_for_throughput = 385 МБ/c (из расчета трафика) / 500 МБ/c = 0.77 <br>
+>Disks_for_iops = 385 / 1000 = 0.385 <br>
+>Disks = max (ceil(0.385), ceil(66) , ceil(0.77)) = <b>66 шт</b>
+
+2.Текст
+>capacity = 31 МБ/c * 86400 * 365 = 977Тб <br>
+>Disks_for_capacity = 977ТБ / 90ТБ = 10 <br>
+>Disks_for_throughput = 31 МБ/c (из расчета трафика) / 500 МБ/c = 0.06 <br>
+>Disks_for_iops = 385 / 1000 = 3.85 <br>
+>Disks = max (ceil(3.85), ceil(0.31) , ceil(30)) = <b>10 шт</b>
+
+3. Мета
+>capacity = 17 МБ/c * 86400 * 365 = 536ТБ <br>
+>Disks_for_capacity = 536ТБ / 90ТБ = 10.9 <br>
+>Disks_for_throughput = 17 МБ/c (из расчета трафика) / 500 МБ/c = 0.034 <br>
+>Disks_for_iops = 385 / 1000 = 0.385 <br>
+>Disks = max (ceil(0.385), ceil(0.034) , ceil(10.9)) = <b>11 шт</b>
+
+4. Реакции
+>capacity = 0.5 МБ/c * 86400 * 365 = 15.8ТБ <br>
+>Disks_for_capacity = 15.8ТБ / 20ТБ (берем малообъемный) = 0.8 <br>
+>Disks_for_throughput = 0.5 МБ/c (из расчета трафика) / 500 МБ/c = 0.001 <br>
+>Disks_for_iops = 385 / 1000 = 0.385 <br>
+>Disks = max (ceil(0.385), ceil(0.001) , ceil(0.8)) = <b>1 шт</b>
+
+Итого: <b>Исходя из расчетов для отдельных типов данных итог следующий: media - SSD; реакции - HDD; мета - HDD; текст - в целом можно тоже взять SSD с заделом на будущее</b>
