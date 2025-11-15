@@ -1,4 +1,8 @@
-// Стоит сделать blob для media в отдельной БД
+// Replication: master-slave sync 
+
+// Sharding by account_id
+//Notice: Роутинг идет по account_id в шарду, где хранятся посты и комменты,
+// В каждом запросе, включая получение хоста будет иметься инфо от чьего аккаунта пост
 
 Table account {
   id uuid [primary key]
@@ -33,12 +37,6 @@ Table comment {
   text varchar(512)
 }
 
-Table tag {
-  id uuid [primary key]
-  name varchar (25)
-  count int
-}
-
 Table tag_post {
   tag_id uuid
   post_id uuid
@@ -49,7 +47,12 @@ Table subscribe {
   channel_id uuid
 }
 
-// Возможно держать запись в другой бд по поиску слов, а тут просто результ. связи
+Table tag {
+  id uuid [primary key]
+  name varchar (25)
+  count int
+}
+
 Table place {
   id uuid
   location decimal
@@ -61,6 +64,10 @@ Table tag_place {
   place_id uuid
   tag_id uuid
 }
+
+Ref: "tag"."id" < "tag_place"."tag_id"
+
+Ref: "place"."id" < "tag_place"."place_id"
 
 Ref account_id_account: account.id < account_posts.account_id
 
@@ -77,7 +84,3 @@ Ref tag_id_post_tag: tag.id < tag_post.tag_id
 Ref account_id_subs: account.id < subscribe.account_id
 
 Ref channel_id_subs: account.id < subscribe.channel_id
-
-Ref: "tag"."id" < "tag_place"."tag_id"
-
-Ref: "place"."id" < "tag_place"."place_id"
