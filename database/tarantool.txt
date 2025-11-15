@@ -1,0 +1,17 @@
+// Образное предствление хранения файлов в tarantool
+
+feed_info {
+    user_id UUID pk,
+    last_update_date date,
+    posts_array array[PostInfo]
+}
+
+PostInfo {
+    media_id uuid,
+    mediaLink varchar.
+    post_id uuid,
+    text varchar,
+    like_count int,
+    location int,
+    create_date date
+}

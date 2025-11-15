@@ -1,0 +1,808 @@
+openapi: 3.0.0
+
+tags:
+  - name: account-service
+  - name: post-manager-service
+  - name: media-processor-service
+  - name: comment-service
+  - name: account-posts-service
+  - name: posts-feed-service
+  - name: reaction-service
+  - name: subscription-service
+  - name: areas-search-service
+
+info:
+  title: Travel Social App API
+  description: Current API describes interaction with Travel Social App
+  version: 1.0.0
+
+paths:
+  /account:
+    put:
+      summary: create new account
+      description: Method creates new account in system
+      tags:
+        - account-service
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                createDate:
+                  type: string
+                userName:
+                  type: string
+                email:
+                  type: string
+                phone:
+                  type: string
+                password:
+                  type: string
+              required:
+                - createDate
+                - userName
+                - email
+                - phone
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accountId:
+                    type: string
+                    description: account id
+                required:
+                  - account-id
+        400:
+          description: Bad Request
+        500:
+          description: Server error
+
+  /account/{accountId}:
+    get:
+      summary: get account info by id
+      description: Method returns account info
+      tags:
+        - account-service
+      parameters:
+        - in: path
+          name: accountId
+          schema:
+            type: integer
+          required: true
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accountId:
+                    type: string
+                    description: account id
+                  createDate:
+                    type: string
+                  userName:
+                    type: string
+                  email:
+                    type: string
+                  phone:
+                    type: string
+                  subscribes:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Subs"
+                required:
+                  - account-id
+                  - createDate
+                  - userName
+                  - email
+                  - phone
+        400:
+          description: Bad Request
+        500:
+          description: Server error
+
+  /post/create:
+    put:
+      summary: create new post for account
+      description: Method creates new post
+      tags:
+        - post-manager-service
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                accountId:
+                  type: integer
+                createDate:
+                  type: string
+                text:
+                  type: string
+                tags:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/Tag"
+                location:
+                  type: string
+                mediaId:
+                  type: string
+              required:
+                - accountId
+                - createDate
+                - location
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  postId:
+                    type: integer
+                    description: postId
+                required:
+                  - account-id
+        400:
+          description: Bad Request
+        500:
+          description: Server error
+
+  /post/update/{postId}:
+    post:
+      summary: change info in existing post by id
+      description: Method changed data in post
+      tags:
+        - post-manager-service
+      parameters:
+        - in: path
+          name: postId
+          schema:
+            type: integer
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                accountId:
+                  type: integer
+                text:
+                  type: string
+                tags:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/Tag"
+                mediaId:
+                  type: string
+              required:
+                - accountId
+                - createDate
+                - location
+      responses:
+        200:
+          description: Ok
+        400:
+          description: Bad Request
+        500:
+          description: Server error
+
+  /post/get/{postId}:
+    post:
+      summary: get post info by postId
+      tags:
+        - post-manager-service
+      parameters:
+        - in: path
+          name: postId
+          schema:
+            type: integer
+          required: true
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  postId:
+                    type: integer
+                  accountId:
+                    type: integer
+                  mediaId:
+                    type: string
+                  createDate:
+                    type: string
+                  reactions:
+                    $ref: "#/components/schemas/Reactions"
+                  tags:
+                    type: array
+                    $ref: "#/components/schemas/Tag"
+                  views:
+                    type: integer
+                required:
+                  - accountId
+                  - postId
+                  - createDate
+                  - views
+        400:
+          description: Bad Request
+        500:
+          description: Server error
+
+  /media/compress:
+    post:
+      summary: compress input media
+      tags:
+        - media-processor-service
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                mediaId:
+                  type: string
+                algorithm:
+                  type: string
+              required:
+                - mediaId
+                - algorithm
+      responses:
+        200:
+          description: Ok
+        400:
+          description: Bad Request
+        500:
+          description: Server error
+
+  /media/get/{postId}:
+    post:
+      summary: get media URI by postId
+      tags:
+        - media-processor-service
+      parameters:
+        - in: path
+          name: postId
+          schema:
+            type: integer
+          required: true
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mediaId:
+                    type: string
+                  mediaUri:
+                    type: string
+                  pusherId:
+                    type: string
+                required:
+                  - mediaUri
+                  - mediaId
+        400:
+          description: Bad Request
+        500:
+          description: Server error
+
+  /media/get/{mediaId}:
+    post:
+      summary: get media URI by mediaId
+      description: Method creates new post
+      tags:
+        - media-processor-service
+      parameters:
+        - in: path
+          name: mediaId
+          schema:
+            type: integer
+          required: true
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mediaUri:
+                    type: string
+                  postId:
+                    type: string
+                  pusherId:
+                    type: string
+                required:
+                  - mediaUri
+                  - postId
+                  - pusherId
+        400:
+          description: Bad Request
+        500:
+          description: Server error
+
+  /comment/add:
+    put:
+      summary: add new comment for post
+      tags:
+        - comment-service
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                accountId:
+                  type: string
+                postId:
+                  type: string
+                text:
+                  type: string
+              required:
+                - accountId
+                - postId
+                - text
+      responses:
+        200:
+          description: Ok
+        400:
+          description: Bad Request
+        500:
+          description: Server error
+  
+  /comment/{postId}/get:
+    get:
+      summary: get pageable comments list of post
+      description: Method creates new post
+      tags:
+        - comment-service
+      parameters:
+        - in: path
+          name: postId
+          schema:
+            type: integer
+          required: true
+        - in: path
+          name: page
+          schema:
+            type: integer
+          required: true
+        - in: path
+          name: size
+          schema:
+            type: integer
+          required: true
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  postId:
+                    type: string
+                  comments:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/CommentInfo"
+                  page:
+                    type: integer
+                  commonSize:
+                    type: integer
+                required:
+                  - account-id
+        400:
+          description: Bad Request
+        500:
+          description: Server error
+
+  /posts/own/get:
+    get:
+      summary: get users own pageable posts list
+      tags:
+        - account-posts-service
+      parameters:
+        - in: path
+          name: page
+          schema:
+            type: integer
+          required: true
+        - in: path
+          name: size
+          schema:
+            type: integer
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                accountId:
+                  type: string
+              required:
+                - accountId
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  postsList:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/PostInfo"
+                  page:
+                    type: integer
+                  size:
+                    type: integer
+                required:
+                  - postsList
+        400:
+          description: Bad Request
+        500:
+          description: Server error
+
+  /posts/{accountId}/get:
+    get:
+      summary: get own pageable posts list by accountId
+      tags:
+        - account-posts-service
+      parameters:
+        - in: path
+          name: page
+          schema:
+            type: integer
+          required: true
+        - in: path
+          name: size
+          schema:
+            type: integer
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                accountId:
+                  type: string
+              required:
+                - accountId
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  postsList:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/PostInfo"
+                  page:
+                    type: integer
+                  size:
+                    type: integer
+                required:
+                  - postsList
+        400:
+          description: Bad Request
+        500:
+          description: Server error
+
+  /feed/{accountId}/get:
+    get:
+      summary: get posts feed for accountId
+      tags:
+        - posts-feed-service
+      parameters:
+        - in: path
+          name: accountId
+          schema:
+            type: integer
+          required: true
+        - in: path
+          name: page
+          schema:
+            type: integer
+          required: true
+        - in: path
+          name: size
+          schema:
+            type: integer
+          required: true
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  parameters:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ParametersData"
+                  feed:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/PostInfo"
+                  page:
+                    type: integer
+                  size:
+                    type: integer
+                required:
+                  - feed
+                  - page
+                  - size
+        400:
+          description: Bad Request
+        500:
+          description: Server error
+
+  /reaction/put:
+    put:
+      summary: make reaction for post
+      description: Method creates new post
+      tags:
+        - reaction-service
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                accountId:
+                  type: string
+                postId:
+                  type: string
+              required:
+                - accountId
+                - postId
+      responses:
+        200:
+          description: Ok
+        400:
+          description: Bad Request
+        500:
+          description: Server error
+
+  /subscriptions/{accountId}/getList:
+    get:
+      summary:  get subscriptions list by accountId
+      description: Method creates new post
+      tags:
+        - subscription-service
+      parameters:
+        - in: path
+          name: accountId
+          schema:
+            type: integer
+          required: true
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  channels:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Subs"
+                required:
+                  - account-id
+        400:
+          description: Bad Request
+        500:
+          description: Server error
+
+  /subscriptions/{accountId}/add:
+    post:
+      summary: add channel to subscribes
+      tags:
+        - subscription-service
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                accountId:
+                  type: string
+                channelId:
+                  type: string
+              required:
+                - accountId
+                - channelId      
+      responses:
+        200:
+          description: Ok
+        400:
+          description: Bad Request
+        500:
+          description: Server error
+
+  /subscriptions/{accountId}/remove:
+    delete:
+      summary: add channel from subscribes
+      tags:
+        - subscription-service
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                accountId:
+                  type: string
+                channelId:
+                  type: string
+              required:
+                - accountId
+                - channelId         
+      responses:
+        200:
+          description: Ok
+        400:
+          description: Bad Request
+        500:
+          description: Server error
+
+  /search/areas/get:
+    get:
+      summary: get result by search query
+      tags:
+        - areas-search-service
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                  accountId:
+                    type: string
+                    description: account id
+                  searchParams:
+                    type: object
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accountId:
+                    type: string
+                    description: account id
+                  resultData:
+                    type: object
+                required:
+                  - accountId
+        400:
+          description: Bad Request
+        500:
+          description: Server error
+
+  /search/areas/recommendation:
+    get:
+      summary: get reccomendation data by search query
+      description: Method creates new post
+      tags:
+        - areas-search-service
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                  accountId:
+                    type: string
+                    description: account id
+                  searchParams:
+                    type: object
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accountId:
+                    type: string
+                    description: account id
+                  resultData:
+                    type: object
+                required:
+                  - accountId
+                  - resultData
+        400:
+          description: Bad Request
+        500:
+          description: Server error
+
+components:
+  schemas:
+    Subs:
+      type: object
+      properties:
+        accountId:
+          type: string
+
+    Tag:
+      type: object
+      properties:
+        name:
+          type: string
+
+    Reactions:
+      type: object
+      properties:
+        like:
+          type: integer
+
+    CommentInfo:
+      type: object
+      properties:
+        accountId:
+          type: string
+        text:
+          type: string
+
+    PostInfo:
+      type: object
+      properties:
+        postId:
+          type: integer
+        accountId:
+          type: integer
+        mediaId:
+          type: string
+        createDate:
+          type: string
+        reactions:
+          $ref: "#/components/schemas/Reactions"
+        tags:
+          type: array
+          $ref: "#/components/schemas/Tag"
+        views:
+          type: integer
+      required:
+        - accountId
+        - postId
+        - createDate
+        - views
+
+    ParametersData:
+      type: object
+      properties:
+        name:
+          type: string
+        value:
+          type: string

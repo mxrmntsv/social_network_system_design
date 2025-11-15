@@ -1,0 +1,83 @@
+// Стоит сделать blob для media в отдельной БД
+
+Table account {
+  id uuid [primary key]
+  create_date timestamp
+  username varchar(50)
+  email varchar(30)
+  phone varchar(30)
+  password varchar(30)
+}
+
+Table post {
+  id uuid [primary key]
+  create_date timestamp
+  account_id uuid
+  location decimal
+  mediaId uuid
+  mediaLink varchar(512)
+  text varchar(256)
+  like_count int
+}
+
+Table account_posts {
+  account_id uuid
+  post_id uuid
+}
+
+Table comment {
+  id uuid [primary key]
+  account_id uuid
+  post_id uuid
+  create_date timestamp
+  text varchar(512)
+}
+
+Table tag {
+  id uuid [primary key]
+  name varchar (25)
+  count int
+}
+
+Table tag_post {
+  tag_id uuid
+  post_id uuid
+}
+
+Table subscribe {
+  account_id uuid
+  channel_id uuid
+}
+
+// Возможно держать запись в другой бд по поиску слов, а тут просто результ. связи
+Table place {
+  id uuid
+  location decimal
+  like_count count
+  dislike_count count 
+}
+
+Table tag_place {
+  place_id uuid
+  tag_id uuid
+}
+
+Ref account_id_account: account.id < account_posts.account_id
+
+Ref post_id_post: post.id < account_posts.post_id
+
+Ref comment_post: comment.post_id > post.id
+
+Ref comment_to_account: comment.account_id > account.id
+
+Ref post_id_post_tag: post.id < tag_post.post_id 
+
+Ref tag_id_post_tag: tag.id < tag_post.tag_id
+
+Ref account_id_subs: account.id < subscribe.account_id
+
+Ref channel_id_subs: account.id < subscribe.channel_id
+
+Ref: "tag"."id" < "tag_place"."tag_id"
+
+Ref: "place"."id" < "tag_place"."place_id"

@@ -1,0 +1,9 @@
+// Образное предствление хранения файлов в S3 хранилища
+
+object {
+  key path
+  create_date 
+  post_id
+  user_id
+  bucket_id
+}
